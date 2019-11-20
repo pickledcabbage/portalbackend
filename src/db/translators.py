@@ -63,3 +63,16 @@ class QueueTranslator(Translator):
             'position': 'N'
         }
         Translator.__init__(self, values, keys)
+
+class CourtTranslator(Translator):
+    def __init__(self):
+        values = {
+            'name': 'S',
+            'type': 'S',
+            'players': 'L',
+            'occupied': 'BOOL'
+        }
+        keys = {
+            'id': 'S',
+        }
+        Translator.__init__(self, values, keys)
