@@ -28,7 +28,7 @@ class QueueDBA(DBA):
             TableName=self.CONFIG_TABLE,
             Item=updated_token
         )
-        return token_last
+        return token_last      
 
     def get_queue_group(self, token):
         key={
@@ -89,7 +89,7 @@ class QueueDBA(DBA):
             }
         )
         if (len(query['Items']) == 0):
-            return
+            return None
         items = query['Items']
         lowest = items[0]
         for i in items:

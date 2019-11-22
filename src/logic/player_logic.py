@@ -1,6 +1,8 @@
 from src.db.PlayerDBA import PlayerDBA
 from src.enums.enums import player_status
 from src.logic.queue_logic import _drop_from_queue
+from src.logic.court_logic import _drop_from_court
+from src.error.ServiceError import ServiceError
 
 
 # no check done, just simply signs up player
@@ -14,7 +16,6 @@ def logic_signup_player(username,name):
     return player
 
 def logic_player_drop(username):
-
     pdba = PlayerDBA()
     player = pdba.get_player(username)
     if player is None:
@@ -25,10 +26,15 @@ def logic_player_drop(username):
     if player['status'] == str(player_status.ON_COURT):
         _drop_from_court(player)
 
-
-def _drop_from_court(player):
-    pass
-
+def logic_get_status(username):
+    pdba = PlayerDBA()
+    player = pdba.get_player(username)
+    if player is None:
+        raise ServiceError('User not found!')
+    return {
+        'status': player['status'],
+        'court': player['court']
+    }
 
 
 

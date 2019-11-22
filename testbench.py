@@ -1,11 +1,17 @@
-import uuid
-from src.db.PlayerDBA import PlayerDBA
+# run this before importing boto3 to set proper time
+import os
+os.environ["TZ"] = "UTC"
+
+from qtd import QTD
+from ptd import PTD
+from ctd import CTD
+from createdb import CREATE_DB
+from createcourts import CREATE_COURTS
 from src.db.QueueDBA import QueueDBA
+from src.db.PlayerDBA import PlayerDBA
 from src.logic.player_logic import builder_player
-from src.logic.queue_logic import logic_signup_group
 
-
-def add20():
+def CREATE_20_PLAYERS():
     users = []
     names = []
 
@@ -18,15 +24,7 @@ def add20():
         if (pdba.get_player(users[i]) is None):
             pdba.put_player(builder_player(users[i], names[i]))
 
-    groups = []
-    for i in range(5):
-        group = users[(i*4):((i+1)*4)]
-        groups.append(group)
-
-    print(groups)
-
-    for i in groups:
-        logic_signup_group(i)
-
 if __name__ == "__main__":
-    add20()    
+    CREATE_DB()
+    CREATE_COURTS()
+    CREATE_20_PLAYERS()

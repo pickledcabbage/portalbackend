@@ -2,6 +2,7 @@ from src.db.QueueDBA import QueueDBA
 from src.db.PlayerDBA import PlayerDBA
 from src.enums.enums import player_status
 from src.error.QueueError import QueueError
+from src.logic.RefreshThread import RefreshThread
 
 def logic_signup_group(players):
     pdba = PlayerDBA()
@@ -22,9 +23,12 @@ def logic_signup_group(players):
     token = qdba.get_config_token()
 
     for i in players:
-        pdba.update_player_status(i, player_status.IN_QUEUE, token)
+        pdba.update_player_status(i, status=player_status.IN_QUEUE, token=token)
 
     qdba.add_to_queue(token, players)
+
+    rt = RefreshThread()
+    rt.start()
 
     return {"Message": "Successfully signed up!"}
 
@@ -47,11 +51,11 @@ def _drop_from_queue(player):
     token = player['queue-position']
     qpos = qdba.get_queue_group(token)
     if (qpos == None):
-        pdba.update_player_status(player['id'], player_status.IDLE, token)
+        pdba.update_player_status(player['id'], status=player_status.IDLE)
         return 'Queue group not found, updated player'
     
     qdba.remove_from_queue(token)
     for i in qpos['players']:
-        pdba.update_player_status(i, player_status.IDLE, token)
+        pdba.update_player_status(i, status=player_status.IDLE)
     
     return 'Successfully removed group'

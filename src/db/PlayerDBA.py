@@ -29,9 +29,13 @@ class PlayerDBA(DBA):
         )
         return "Created player!"
 
-    def update_player_status(self, username, status, token_last):
+    def update_player_status(self, username, status=None, token=None, court=None):
         player = self.get_player(username)
         if player is not None:
-            player['status'] =  str(status)
-            player['queue-position'] = token_last
+            if token is not None:
+                player['queue-position'] = token
+            if status is not None:
+                player['status'] =  str(status)
+            if court is not None:
+                player['court'] = court
             self.put_player(player)

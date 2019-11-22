@@ -3,7 +3,6 @@ from flask import Response
 from flask import request
 from flask_cors import CORS
 from api_world import api_world
-from src.db.dba import DBAccessor
 from src.error.ServiceError import ServiceError
 from src.activity.apis import *
 import json
@@ -62,66 +61,33 @@ def add_to_queue():
         return makeBadResponse(message=e.message)
     return makeResponse(obj)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-###################################################### TEST APIs ##########################################################
-
-# @app.route('/home')
-# def second_index():
-#     return "brave new home!"
-
-@app.route('/tablenames')
-def server_status():
-    dba = DBAccessor()
-    obj = { "TableNames": dba.get_table_names() }
+@app.route('/getcourtdata')
+def get_court_data():
+    if (request.method == 'OPTIONS'):
+        return makeOptionsResponse()
+    obj = api_get_court_data()
     return makeResponse(obj)
 
-@app.route('/get/player/<string:id>')
-def get_player(id):
-    dba = DBAccessor()
-    obj = { "player": dba.get_player(id) }
+@app.route('/drop', methods=['POST'])
+def drop():
+    if (request.method == 'OPTIONS'):
+        return makeOptionsResponse()
+    try:
+        obj = api_drop_player(request.json)
+    except ServiceError as e:
+        return makeBadResponse(message=e.message)
     return makeResponse(obj)
 
-@app.route('/put/player/<string:id>')
-def put_player(id):
-    dba = DBAccessor()
-    obj = { "player": dba.create_player({
-        'id': {'S': id},
-        'name': {'S':'player-name'},
-        'court': {'S': 'court-id'},
-        'status': {'S': 'status'}
-    }) }
+@app.route('/playerstatus', methods=['POST'])
+def get_status():
+    if (request.method == 'OPTIONS'):
+        return makeOptionsResponse()
+    try:
+        obj = api_get_player_status(request.json)
+    except ServiceError as e:
+        return makeBadResponse(message=e.message)
     return makeResponse(obj)
 
-@app.route('/courts')
-def get_courts():
-    dba = DBAccessor()
-    obj = { 'courts': dba.get_courts()}
-    return makeResponse(obj)
-
-# @app.route('/add/<string:table>', methods=['POST', 'OPTIONS'])
-# def add_to_table(table):
-#     if (request.method == 'OPTIONS'):
-#         return makeOptionsResponse()
-#     content = request.json
-#     return makeResponse({'content': content})
 
 if __name__ == '__main__':
     app.run(debug=True)
